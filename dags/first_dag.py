@@ -12,12 +12,16 @@ except Exception as e:
 	print("Error {}".format(e))
 
 
-def first_function_execute(*args, **kwargs):
+def first_function_execute(**context):
 
-	variable = kwargs.get("name", "Didn't get the key")
+	print("first function executing ")
+	context["ti"].xcom_push( key = "mkey" , value = "the passed value from fucntion 1" )
 
-	print("Hello {}".format(variable))
-	return "Hello + " + variable
+
+def second_function_execute(**context):
+
+	instance = context.get("ti").xcom_pull(key="mkey")
+	print("This is the second fucntion running. The value from the first fucntion is - {} ".format(instance) )
 
 
 with DAG(
@@ -40,11 +44,21 @@ with DAG(
 
 		task_id = "first_function_execute",
 		python_callable = first_function_execute,
-		op_kwargs = {"name" : "Aroun Dalawat"}
+		provide_context = True
+		# op_kwargs = {"name" : "Aroun Dalawat"}
+		
+		)
+	
+	second_function_execute = PythonOperator(
+
+		task_id = "second_function_execute",
+		python_callable = second_function_execute,
+		provide_context = True
 		
 		)
 
 
 
+first_function_execute >> second_function_execute
 
 
