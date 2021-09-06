@@ -12,9 +12,12 @@ except Exception as e:
 	print("Error {}".format(e))
 
 
-def first_function_execute():
-	print("Hello world")
-	return "Hello World"
+def first_function_execute(*args, **kwargs):
+
+	variable = kwargs.get("name", "Didn't get the key")
+
+	print("Hello {}".format(variable))
+	return "Hello + " + variable
 
 
 with DAG(
@@ -36,7 +39,10 @@ with DAG(
 	first_function_execute = PythonOperator(
 
 		task_id = "first_function_execute",
-		python_callable = first_function_execute)
+		python_callable = first_function_execute,
+		op_kwargs = {"name" : "Aroun Dalawat"}
+		
+		)
 
 
 
